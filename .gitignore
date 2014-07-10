@@ -1,0 +1,16 @@
+!.gitignore
+!.htaccess
+!web.config
+
+# Node, npm, Gulp, Bower
+node_modules/
+.tmp/
+/public/*
+/src/bower_components/*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# OS X
+.DS_Store

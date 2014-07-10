@@ -1,0 +1,16 @@
+{
+  "name": "davo",
+  "version": "0.0.1",
+  "authors": [
+    "David Veselý <davidvesely.cz@gmail.com>"
+  ],
+  "main": "gulpfile.js",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

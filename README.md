@@ -3,14 +3,14 @@ My frontend sandbox
 
 Installation
 --------------
-#Clone:
+###Clone:
 	$ git clone git@github.com:Vesely/davo.git
 
-#Install npm packages
+###Install npm packages
 	$ npm install
 
-#Install bower components
+###Install bower components
 	$ bower install
 
-#Run gulp
+###Run gulp
 	$ gulp watch

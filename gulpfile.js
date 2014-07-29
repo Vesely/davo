@@ -1,115 +1,136 @@
 //Gulp variables
 var gulp = require('gulp');
-var less = require('gulp-less');
+var $ = require('gulp-load-plugins')();
+
 var path = require('path');
 var watch = require('gulp-watch');
-var livereload = require('gulp-livereload');
-var cssmin = require('gulp-cssmin');
-var rename = require('gulp-rename');
-var uglify = require('gulp-uglify');
-var imagemin = require('gulp-imagemin');
-var pngcrush = require('imagemin-pngcrush');
 var minifyHTML = require('gulp-minify-html');
+var pngcrush = require('imagemin-pngcrush');
+
+// var less = require('gulp-less');
+// var livereload = require('gulp-livereload');
+// var cssmin = require('gulp-cssmin');
+// var rename = require('gulp-rename');
+// var uglify = require('gulp-uglify');
+// var imagemin = require('gulp-imagemin');
+
 var ftp = require('gulp-ftp');
+var browserSync = require('browser-sync');
 
 
 //Path variables
-var SRC  = "./src";
-var SRC_LESS_BASE  = path.join(SRC, "less");
-var SRC_JAVASCRIPT_BASE  = path.join(SRC, "js");
-var SRC_IMAGES_BASE  = path.join(SRC, "img");
-var SRC_BOWER_BASE  = path.join(SRC, "bower_components");
+var src = './src';
+var srcLessBase = path.join(src, 'less');
+var srcLessFile = path.join(src, 'less/all.less');
+var srcBase = path.join(src, 'js');
+var srcImagesBase = path.join(src, 'img');
+var srcBowerBase = path.join(src, 'bower_components');
 
-var SRC_ALL  = path.join(SRC, "**");
-var SRC_HTML  = path.join(SRC, "**", "*.html");
-var SRC_LESS_ALL  = path.join(SRC_LESS_BASE, "**", "*.less");
-var SRC_JAVASCRIPT_ALL  = path.join(SRC_JAVASCRIPT_BASE, "**", "*.js");
-var SRC_IMAGES_ALL  = path.join(SRC_IMAGES_BASE, "**", "*");
-var SRC_BOWER_ALL  = path.join(SRC_BOWER_BASE, "**", "*");
+var srcAll = path.join(src, '**');
+var srcHtml = path.join(src, '**', '*.html');
+var srcLessAll = path.join(srcLessBase, '**', '*.less');
+var srcJavascriptAll = path.join(srcBase, '**', '*.js');
+var srcImagesAll = path.join(srcImagesBase, '**', '*');
+var srcBowerAll = path.join(srcBowerBase, '**', '*');
 
-var PUBLIC = "./public";
-var PUBLIC_LIB = path.join(PUBLIC, "lib");
-var PUBLIC_ALL = path.join(PUBLIC, "**");
-var PUBLIC_LESS = path.join(PUBLIC, "css");
-var PUBLIC_JAVASCRIPT = path.join(PUBLIC, "js");
-var PUBLIC_IMAGES = path.join(PUBLIC, "img");
-var PUBLIC_BOWER = path.join(PUBLIC, "bower_components");
+var dist = './dist';
+var distAll = path.join(dist, '**');
+var distLess = path.join(dist, 'css');
+var distJavascript = path.join(dist, 'js');
+var distImages = path.join(dist, 'img');
+var distBower = path.join(dist, 'bower_components');
+
+
+
+//Minify HTML
+gulp.task('minify-html', function() {
+  var opts = {comments:true,spare:true};
+
+  gulp.src(srcHtml)
+    .pipe(minifyHTML(opts))
+    .pipe(gulp.dest(dist))
+    .pipe($.size({title: 'html'}))
+    .pipe($.livereload());
+});
+
+
+// Copy all files from SRC to DIST
+gulp.task('copy', function () {
+  return gulp.src([src+'/*','!'+src+'/*.html'], {dot: true})
+    .pipe(gulp.dest(dist))
+    .pipe($.size({title: 'copy'}))
+    .pipe($.livereload());
+});
+
+//Minimalise Images
+gulp.task('imagemin', function() {
+  gulp.src(srcImagesAll)
+    .pipe($.cache($.imagemin({
+        progressive: true,
+        svgoPlugins: [{removeViewBox: false}],
+        use: [pngcrush()]
+    })))
+    .pipe(gulp.dest(distImages))
+    .pipe($.size({title: 'images'}));
+});
+
+
+//LESS
+gulp.task('less', function () {
+  gulp.src(srcLessFile)
+  	// .pipe(watch())
+    .pipe($.sourcemaps.init())
+    .pipe($.less())
+    // .pipe($.less({
+      // modifyVars:true,
+      // paths: [ path.join(__dirname, 'less', 'includes') ]
+      // paths: [ './src/less/all.less' ]
+    // }))
+    .pipe($.autoprefixer())
+    .pipe($.cssmin())
+    .pipe($.rename({suffix: '.min'}))
+    .pipe($.sourcemaps.write())
+    .pipe(gulp.dest(distLess))
+    .pipe($.size({title: 'styles'}))
+    .pipe($.livereload());
+});
+
+
+//Javascript compress
+gulp.task('compress', function() {
+  gulp.src(srcJavascriptAll)
+    .pipe($.uglify())
+    .pipe(gulp.dest(distJavascript))
+    .pipe($.size({title: 'javascript'}))
+    .pipe($.livereload());
+});
+
+
+// Static server
+gulp.task('browser-sync', function() {
+    browserSync({
+        server: {
+            baseDir: ['dist']
+        }
+    });
+});
 
 //Default
 gulp.task('default', function() {
 
 });
 
-//Minify HTML
-gulp.task('minify-html', function() {
-  var opts = {comments:true,spare:true};
-
-  gulp.src(SRC_HTML)
-    .pipe(minifyHTML(opts))
-    .pipe(gulp.dest(PUBLIC))
-    .pipe(livereload());
-});
-
-//Htaccess
-gulp.task('htaccess', function() {
-  gulp.src('./src/.htaccess')
-    .pipe(gulp.dest(PUBLIC));
-});
-
-//Minimalise Images
-gulp.task('imagemin', function() {
-  gulp.src(SRC_IMAGES_ALL)
-    .pipe(imagemin({
-        progressive: true,
-        svgoPlugins: [{removeViewBox: false}]
-        //use: [pngcrush()]
-    }))
-    .pipe(gulp.dest(PUBLIC_IMAGES));
-});
-
-
-//LESS
-gulp.task('less', function () {
-  gulp.src(SRC_LESS_ALL)
-  	// .pipe(watch())
-    .pipe(less({
-      paths: [ path.join(__dirname, 'less', 'includes') ]
-    }))
-    .pipe(cssmin())
-    .pipe(rename({suffix: '.min'}))
-    .pipe(gulp.dest(PUBLIC_LESS))
-    .pipe(livereload());
-});
-
-
-//Javascript compress
-gulp.task('compress', function() {
-  gulp.src(SRC_JAVASCRIPT_ALL)
-    .pipe(uglify())
-    .pipe(gulp.dest(PUBLIC_JAVASCRIPT))
-    .pipe(livereload());
-});
-
 //Watch
-gulp.task('watch', ['less', 'minify-html', 'imagemin', 'compress', 'htaccess'], function() {
-  gulp.watch(SRC_LESS_ALL, ['less']);
-  gulp.watch(SRC_HTML, ['minify-html']);
-  gulp.watch(SRC_IMAGES_ALL, ['imagemin']);
-  gulp.watch(SRC_JAVASCRIPT_ALL, ['compress']);
+gulp.task('watch', ['less', 'minify-html', 'imagemin', 'compress', 'copy', 'browser-sync'], function() {
+  gulp.watch(srcLessAll, ['less']);
+  gulp.watch(srcHtml, ['minify-html']);
+  gulp.watch(srcImagesAll, ['imagemin']);
+  gulp.watch(srcJavascriptAll, ['compress']);
   
-  gulp.watch('./src/.htaccess', ['htaccess']);
+  gulp.watch([src+'/*','!'+src+'/*.html'], ['copy']);
 
-  gulp.src(SRC_BOWER_ALL)
-    	.pipe(gulp.dest(PUBLIC_BOWER));
+  gulp.src(srcBowerAll)
+    	.pipe(gulp.dest(distBower));
 });
 
-//Upload
-gulp.task('upload', function () {
-	return gulp.src('./public/**')
-	    .pipe(ftp({
-	        host: '16158.w58.wedos.net',
-	        user: 'w16158_davo',
-	        pass: 'TUFVnJVA'
-	    }));
-});
 

@@ -1,6 +1,6 @@
 /* Created by David Veselý */
 body{ 
-	background: #F7F7F7;
+	background: @david;
 	padding-top:10px;
 }
 
@@ -23,25 +23,20 @@ hr{
 }
 .anim{
 	transition: all .25s ease-in-out;
-	-moz-transition: all .25s ease-in-out;
-	-webkit-transition: all .25s ease-in-out;
 }
 a[href^="error:"] {
 	background: red;
 	color: white;
 }
 
+
+
 .btn{
 	transition: all .15s ease-in-out;
-	-moz-transition: all .15s ease-in-out;
-	-webkit-transition: all .15s ease-in-out;
 }
 //Button on click feedback
 .btn:active, .btn.active{
 	transform:translateY(2px);
-	-ms-transform:translateY(2px);
-	-moz-transform:translateY(2px);
-	-webkit-transform:translateY(2px);
 }
 
 .field--wrapper {
@@ -49,21 +44,21 @@ a[href^="error:"] {
   margin-bottom:20px;
 }
 label {
-  position:absolute;
-  top:-13px;
-  left:0;
-  font-size:11px;
-  color:#aaa;
-  transition: all 0.1s linear;
-  opacity:0;
-  font-weight:bold;
-}
-label.on {
-  color:#4481C4;
-}
-label.show {
-  top:-15px;
-  opacity:1;
+	position:absolute;
+	top:-13px;
+	left:0;
+	font-size:11px;
+	color:#aaa;
+	transition: all 0.1s linear;
+	opacity:0;
+	font-weight:bold;
+	&.on {
+		color:#4481C4;
+	}
+	&.show {
+		top:-15px;
+		opacity:1;
+	}
 }
 
 

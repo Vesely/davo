@@ -5,7 +5,7 @@
 # Node, npm, Gulp, Bower
 node_modules/
 .tmp/
-/public/*
+/dist/*
 /src/bower_components/*
 
 # Windows

@@ -79,7 +79,7 @@ gulp.task('less', function () {
       .pipe($.cssmin())
     
     .pipe($.rename({suffix: '.min'}))
-    .pipe($.pako.deflate())//Create deflate
+    //.pipe($.pako.deflate())//Create deflate
     
     .pipe(gulp.dest(distLess))
       .pipe($.size({title: 'styles min'}))
